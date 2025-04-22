@@ -7,6 +7,7 @@ import { GridPattern } from "@/components/magicui/grid-pattern";
 import { Spotlight } from "@/components/ui/spotlight";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 export function CTASection() {
   const { theme } = useTheme();
@@ -46,10 +47,12 @@ export function CTASection() {
           need a website, web application, or technical consultation, I&apos;m
           here to help.
         </p>
-        <Button size="lg" className="group">
-          Get Started
-          <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-        </Button>
+        <Link href="#contact">
+          <Button size="lg" className="group">
+            Get Started
+            <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+          </Button>
+        </Link>
       </motion.div>
     </section>
   );

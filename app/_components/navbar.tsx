@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import {
   Navbar,
   NavBody,
@@ -13,10 +14,39 @@ import {
 } from "@/components/ui/resizable-navbar";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
+import Link from "next/link";
 import { useState } from "react";
 
 export function NavbarApp() {
   const { theme, setTheme } = useTheme();
+  const [activeSection, setActiveSection] = useState("home");
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const observerOptions = {
+      threshold: 0.6,
+      rootMargin: "-100px 0px -100px 0px",
+    };
+
+    const observerCallback = (entries: IntersectionObserverEntry[]) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          setActiveSection(entry.target.id);
+        }
+      });
+    };
+
+    const observer = new IntersectionObserver(
+      observerCallback,
+      observerOptions
+    );
+
+    document.querySelectorAll("section[id]").forEach((section) => {
+      observer.observe(section);
+    });
+
+    return () => observer.disconnect();
+  }, []);
 
   const navItems = [
     { name: "Home", link: "#home" },
@@ -25,29 +55,22 @@ export function NavbarApp() {
     { name: "Contact", link: "#contact" },
   ];
 
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  const scrollToSection = (id: string) => {
-    const element = document.getElementById(id);
-    if (element) {
-      // const navbarHeight = document.querySelector("nav")?.offsetHeight || 80;
-      // const elementPosition = element.getBoundingClientRect().top;
-      // const offsetPosition =
-      //   elementPosition + window.pageYOffset - navbarHeight;
-      // window.scrollTo({
-      //   top: offsetPosition,
-      //   behavior: "smooth",
-      // });
-    }
-  };
-
   return (
     <div className="fixed w-full z-50">
       <Navbar>
         {/* Desktop Navigation */}
         <NavBody>
           <NavbarLogo />
-          <NavItems items={navItems} />
+          <NavItems
+            items={navItems}
+            activeSection={activeSection}
+            onItemClick={(link) => {
+              const sectionId = link.replace("#", "");
+              document
+                .getElementById(sectionId)
+                ?.scrollIntoView({ behavior: "smooth" });
+            }}
+          />
           <div className="flex items-center gap-4">
             {/* <NavbarButton variant="secondary">Login</NavbarButton> */}
 
@@ -60,7 +83,10 @@ export function NavbarApp() {
               <Moon className="h-5 w-5 rotate-90 scale-0 transition-transform duration-300 dark:rotate-0 dark:scale-100" />
               <span className="sr-only">Toggle theme</span>
             </NavbarButton>
-            <NavbarButton variant="primary">Book a call</NavbarButton>
+
+            <NavbarButton href="#contact" variant="primary">
+              Book a call
+            </NavbarButton>
           </div>
         </NavBody>
 
@@ -93,7 +119,7 @@ export function NavbarApp() {
                 key={`mobile-link-${idx}`}
                 onClick={(e) => {
                   e.preventDefault();
-                  scrollToSection(item.link.replace("#", ""));
+                  // scrollToSection(item.link.replace("#", ""));
                   setIsMobileMenuOpen(false);
                 }}
                 className="relative text-neutral-600 dark:text-neutral-300 cursor-pointer"
